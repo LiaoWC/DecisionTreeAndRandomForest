@@ -3,6 +3,7 @@ from numpy.typing import ArrayLike
 from typing import Optional, List
 from copy import deepcopy
 from graphviz import Digraph
+from exception import *
 
 
 def check_transform_xy(x: ArrayLike, y: ArrayLike) -> (np.ndarray, np.ndarray):
@@ -11,7 +12,7 @@ def check_transform_xy(x: ArrayLike, y: ArrayLike) -> (np.ndarray, np.ndarray):
     # Check dimensions
     x_dim, y_dim = len(x.shape), len(y.shape)
     if x_dim != 2 or y_dim != 1:
-        raise ValueError("Shapes of x and y must be 2 and 1 respectively, but got: x's dim={} and y's dim={}.".format(
+        raise ValueError("Dimensions of x and y must be 2 and 1 respectively, but got: x's dim={} and y's dim={}.".format(
             x_dim, y_dim))
     return x, y
 
@@ -84,8 +85,6 @@ class Node:
                 right_gini = calculate_gini(right_group[:, -1]) if len(right_group) > 0 else 0
                 total_remaining_impurity = len(left_group) * left_gini + len(right_group) * right_gini
                 # Check if better
-                print('ttt:', total_remaining_impurity, self.cur_best_remaining_impurity, len(left_group), left_gini,
-                      len(right_group), right_gini)
                 if total_remaining_impurity < self.cur_best_remaining_impurity:
                     self.cur_best_remaining_impurity = deepcopy(total_remaining_impurity)
                     self.cur_best_attr = deepcopy(attr)
@@ -102,7 +101,6 @@ class Node:
         self.targets = deepcopy(y)
         # Recursive
         if len(self.cur_best_left_group) > 0 and len(self.cur_best_right_group) > 0 and self.gini != 0.0:
-            print('Cur best l r gini:', self.cur_best_left_group_gini, self.cur_best_right_group_gini)
             self.left_child = Node(gini=self.cur_best_left_group_gini)
             self.left_child.fit(x=self.cur_best_left_group[:, :-1], y=self.cur_best_left_group[:, -1], is_root=False)
             self.right_child = Node(gini=self.cur_best_right_group_gini)
@@ -111,8 +109,15 @@ class Node:
             # TODO: Gini calculated by parent, but
             self.is_leaf = True
 
-    def pred(self):
-        pass
+    #
+    # def pred(self, sample):
+    #     while True:
+    #         if self.is_leaf:
+    #             return self.targets
+    #         if sample[self.attr_idx] <= self.threshold:
+    #
+    #         else:
+    #             pass
 
     def _attr_str(self, attr_names: Optional[List[str]] = None):
         return attr_names[self.attr_idx] + '\n' if attr_names else f'X[{self.attr_idx}]'
@@ -165,14 +170,48 @@ class Node:
 class DecisionTree:
     def __init__(self):
         self.root: Optional[Node] = None
+        self.n_attrs: Optional[int] = None
 
     def fit(self, x: ArrayLike, y: ArrayLike):
         x, y = check_transform_xy(x, y)
+        self.n_attrs = x.shape[1]
         self.root = Node()
         self.root.fit(x, y, is_root=True)
 
-    def pred(self):
-        pass
+    def pred(self, x: ArrayLike):
+        """
+
+        :param x: 2d float numpy arr(dim 0 is samples; dim 1 is attrs) or 1d array with only one sample to pred
+        :return:
+        """
+        # Check if fitted
+        if self.n_attrs is None:
+            raise NotFittedError("Please fit the model before using to predict.")
+        # If input is 1d make it be 2d
+        x_dim1 = False
+        if len(x.shape) == 1:
+            x = np.expand_dims(x)
+            x_dim1 = True
+        # Check input num of attrs
+        if x.shape[1] != self.n_attrs:
+            raise NumAttrError("Number of attrs of x is not the same as the number of attrs your fitting data uses.")
+        # Pred
+        pred = []
+        for sample in x:
+            cur_node = self.root
+            while True:
+                if cur_node.is_leaf:
+                    pred.append(cur_node.targets[0])
+                    break
+                if sample[cur_node.attr_idx] <= cur_node.threshold:
+                    cur_node = cur_node.left_child
+                else:
+                    cur_node = cur_node.right_child
+        pred = np.array(pred)
+        #
+        if x_dim1:
+            pred = pred[0]
+        return pred
 
     def view(self, filename: str = 'DecisionTreeOutput',
              attr_names: Optional[List[str]] = None,
@@ -188,144 +227,3 @@ class DecisionTree:
         self.root.view(digraph=dg, attr_names=attr_names, target_names=target_names)
         dg.view()
 
-
-from sklearn.datasets import load_iris
-
-iris = load_iris()
-d = DecisionTree()
-d.fit(x=iris.data, y=iris.target)
-d.view(attr_names=iris.feature_names, target_names={i: iris.target_names[i] for i in range(len(iris.target_names))})
-
-# TODO: Plot tree
-
-#
-# from graphviz import Digraph
-#
-# dot = Digraph(comment='The Round Table')
-#
-# dot.node('A', 'King Arthur\ngini=0')
-# dot.node('B', 'Sir Bedevere the Wise')
-# dot.node('L', 'Sir Lancelot the Brave')
-#
-# dot.edges(['AB', 'AL'])
-# # dot.edge('B', 'L', constraint='false')
-# dot.edge('B', 'L')
-#
-# print(dot.source)
-#
-# dot.render('test-output/round-table.gv', view=True)
-#
-
-#
-# u = Digraph('unix', filename='unix.gv',
-#             node_attr={'color': 'lightblue2', 'style': 'filled'})
-# u.edge('5th Edition', '6th Edition')
-# u.edge('5th Edition', 'PWB 1.0')
-# u.edge('6th Edition', 'LSX')
-# u.edge('6th Edition', '1 BSD')
-# u.edge('6th Edition', 'Mini Unix')
-# u.edge('6th Edition', 'Wollongong')
-# u.edge('6th Edition', 'Interdata')
-# u.edge('Interdata', 'Unix/TS 3.0')
-# u.edge('Interdata', 'PWB 2.0')
-# u.edge('Interdata', '7th Edition')
-# u.edge('7th Edition', '8th Edition')
-# u.edge('7th Edition', '32V')
-# u.edge('7th Edition', 'V7M')
-# u.edge('7th Edition', 'Ultrix-11')
-# u.edge('7th Edition', 'Xenix')
-# u.edge('7th Edition', 'UniPlus+')
-# u.edge('V7M', 'Ultrix-11')
-# u.edge('8th Edition', '9th Edition')
-# u.edge('1 BSD', '2 BSD')
-# u.edge('2 BSD', '2.8 BSD')
-# u.edge('2.8 BSD', 'Ultrix-11')
-# u.edge('2.8 BSD', '2.9 BSD')
-# u.edge('32V', '3 BSD')
-# u.edge('3 BSD', '4 BSD')
-# u.edge('4 BSD', '4.1 BSD')
-# u.edge('4.1 BSD', '4.2 BSD')
-# u.edge('4.1 BSD', '2.8 BSD')
-# u.edge('4.1 BSD', '8th Edition')
-# u.edge('4.2 BSD', '4.3 BSD')
-# u.edge('4.2 BSD', 'Ultrix-32')
-# u.edge('PWB 1.0', 'PWB 1.2')
-# u.edge('PWB 1.0', 'USG 1.0')
-# u.edge('PWB 1.2', 'PWB 2.0')
-# u.edge('USG 1.0', 'CB Unix 1')
-# u.edge('USG 1.0', 'USG 2.0')
-# u.edge('CB Unix 1', 'CB Unix 2')
-# u.edge('CB Unix 2', 'CB Unix 3')
-# u.edge('CB Unix 3', 'Unix/TS++')
-# u.edge('CB Unix 3', 'PDP-11 Sys V')
-# u.edge('USG 2.0', 'USG 3.0')
-# u.edge('USG 3.0', 'Unix/TS 3.0')
-# u.edge('PWB 2.0', 'Unix/TS 3.0')
-# u.edge('Unix/TS 1.0', 'Unix/TS 3.0')
-# u.edge('Unix/TS 3.0', 'TS 4.0')
-# u.edge('Unix/TS++', 'TS 4.0')
-# u.edge('CB Unix 3', 'TS 4.0')
-# u.edge('TS 4.0', 'System V.0')
-# u.edge('System V.0', 'System V.2')
-# u.edge('System V.2', 'System V.3')
-# u.render('test-output/round-table.gv', view=True)
-# # u.view()
-
-
-# from graphviz import Source
-# temp = """
-# digraph G{
-# edge [dir=forward]
-# node [shape=plaintext]
-#
-# No.0 [label="0 (None)\nHola"]
-# 0 -> 5 [label="root"]
-# 1 [label="1 (Hello)"]
-# 2 [label="2 (how)"]
-# 2 -> 1 [label=">="]
-# 3 [label="3 (are)"]
-# 4 [label="4 (you)"]
-# 5 [label="5 (doing)"]
-# 5 -> 3 [label="aux"]
-# 5 -> 2 [label="advmod"]
-# 5 -> 4 [label="nsubj"]
-# }
-# """
-# s = Source(temp, filename="test.gv", format="png")
-# s.view()
-#
-#
-# import matplotlib as mpl
-# from matplotlib import cm
-# import colorsys
-# import functools
-# import graphviz as gv
-#
-# def add_nodes(graph, nodes):
-#     for n in nodes:
-#         if isinstance(n, tuple):
-#             graph.node(n[0], **n[1])
-#         else:
-#             graph.node(n)
-#     return graph
-#
-# A = [[517, 1, [409], 10, 6],
-#      [534, 1, [584], 10, 12],
-#      [614, 1, [247], 11, 5],
-#      [679, 1, [228], 13, 7],
-#      [778, 1, [13], 14, 14]]
-#
-# nodesgv = []
-# Arange = [ a[0] for a in A]
-# norm = mpl.colors.Normalize(vmin = min(Arange), vmax = max(Arange))
-# cmap = cm.jet
-#
-# for index, i in enumerate(A):
-#     x = i[0]
-#     m = cm.ScalarMappable(norm = norm, cmap = cmap)
-#     mm = m.to_rgba(x)
-#     M = colorsys.rgb_to_hsv(mm[0], mm[1], mm[2])
-#     nodesgv.append((str(i[0]),{'label': str((i[1])), 'color': "%f, %f, %f" % (M[0], M[1], M[2]), 'style': 'filled'}))
-#
-# graph = functools.partial(gv.Graph, format='svg', engine='neato')
-# add_nodes(graph(), nodesgv).render(('img/test'))
