@@ -3,11 +3,12 @@ class Error(Exception):
 
 
 class NotFittedError(Error):
-        pass
+    pass
 
 
 class NumAttrError(Error):
     pass
+
 
 class NotExpectedError(Error):
     pass

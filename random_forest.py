@@ -7,12 +7,12 @@ from copy import deepcopy
 
 class RandomForest:
     def __init__(self, n_trees: int, tree_bagging: bool, tree_samples_ratio: float, max_attrs: Optional[int]):
-        """
+        """ Construct a random forest.
         P.S. Attr bagging use `floor(n_attrs^(1/2))` attrs
         P.S. Each tree use `max(1, floor(n_samples * tree_sample_ration))`
-        :param n_trees:
-        :param tree_bagging:
-        :param tree_samples_ratio:
+        :param n_trees: Number of trees.
+        :param tree_bagging: Whether do tree bagging.
+        :param tree_samples_ratio: Tree bagging ratio.
         """
         self.n_trees: int = n_trees
         self.tree_samples_ratio: float = tree_samples_ratio
@@ -23,6 +23,12 @@ class RandomForest:
 
     @staticmethod
     def _tree_bagging(x, y, tree_samples_ratio):
+        """ Do tree bagging.
+        :param x: training input samples
+        :param y: target values
+        :param tree_samples_ratio: Ratio to pick up with replacement.
+        :return: x, y, indices
+        """
         n_samples = x.shape[0]
         if tree_samples_ratio > 1 or tree_samples_ratio < 0:
             raise ValueError(f'"tree_samples_ratio" must be < 1 and > 0 but got {tree_samples_ratio}')
@@ -30,12 +36,11 @@ class RandomForest:
         return x[indices], y[indices], indices
 
     def fit(self, x, y, return_oob_error: bool = False):
-        """
-:
+        """ Fit this random forest.:
         :param x: 2d float numpy arr; dim 0 is samples; dim 1 is attrs
         :param y: 1d float numpy arr; dim 0 is samples' classes
-        :param return_oob_error
-        :return:
+        :param return_oob_error: Whether calculate and return oob error.
+        :return: If return_oob_error turned on, return oob error; else, return None
         """
         for tree in self.trees:
             _x, _y = deepcopy(x), deepcopy(y)
@@ -60,12 +65,11 @@ class RandomForest:
             return n_incorrect / x.shape[0]
 
     def pred(self, x, regression: bool = False):
-        """
+        """ Predict a sample or a numpy array of samples.
         If regression = True, average the voting result, else pick most frequent class
-
-        :param x:
-        :param regression:
-        :return:
+        :param x: Samples to be predicted.
+        :param regression: Whether do regression.
+        :return: Predicted outcome. Dimension depending on your input x.
         """
         preds = []
         for i, tree in enumerate(self.trees):

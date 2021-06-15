@@ -4,6 +4,7 @@ import numpy as np
 
 def plot_cm(cm, title="Confusion Matrix", figsize=(6, 6), xticks=None, yticks=None,
             save_name=None, is_int: bool = False):
+    """For plotting a confusion matrix with color bar."""
     plt.figure(figsize=figsize)
     plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
     plt.title(title, fontsize=24)
