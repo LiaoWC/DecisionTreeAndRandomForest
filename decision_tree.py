@@ -12,8 +12,9 @@ def check_transform_xy(x: ArrayLike, y: ArrayLike) -> (np.ndarray, np.ndarray):
     # Check dimensions
     x_dim, y_dim = len(x.shape), len(y.shape)
     if x_dim != 2 or y_dim != 1:
-        raise ValueError("Dimensions of x and y must be 2 and 1 respectively, but got: x's dim={} and y's dim={}.".format(
-            x_dim, y_dim))
+        raise ValueError(
+            "Dimensions of x and y must be 2 and 1 respectively, but got: x's dim={} and y's dim={}.".format(
+                x_dim, y_dim))
     return x, y
 
 
@@ -53,12 +54,14 @@ class Node:
         self.cur_best_left_group_gini = None
         self.cur_best_right_group_gini = None
 
-    def fit(self, x: np.ndarray, y: np.ndarray, is_root: bool):
+    def fit(self, x: np.ndarray, y: np.ndarray, is_root: bool, max_attrs: Optional[int], rand_state: Optional[int]):
         """
 
+        :param rand_state:
         :param is_root: Identify if it's root. For checking params at root.
         :param x: 2d float numpy arr; dim 0 is samples; dim 1 is attrs
         :param y: 1d float numpy arr; dim 0 is samples' classes
+        :param max_attrs: When splitting, random choose attrs up to this number to consider.
         :return:
         """
         # Check x, y
@@ -67,7 +70,14 @@ class Node:
             self.gini = calculate_gini(y=y)
 
         # Check each attr, picking one
-        attrs: List = np.arange(x.shape[1])
+        attrs: np.ndarray = np.arange(x.shape[1])
+        if max_attrs is not None:  # Pick all if max_attrs is None
+            n_attrs_get = min(len(attrs), max_attrs)
+            if rand_state is not None:
+                rng = np.random.RandomState(rand_state)
+                attrs = np.array(attrs[rng.choice(attrs.shape[0], n_attrs_get, replace=False)])
+            else:
+                attrs = np.array(attrs[np.random.choice(attrs.shape[0], n_attrs_get, replace=False)])
         for attr in attrs:
             # Concatenate x & y
             xy = np.concatenate((x, np.expand_dims(y, axis=1)), axis=1)
@@ -102,22 +112,14 @@ class Node:
         # Recursive
         if len(self.cur_best_left_group) > 0 and len(self.cur_best_right_group) > 0 and self.gini != 0.0:
             self.left_child = Node(gini=self.cur_best_left_group_gini)
-            self.left_child.fit(x=self.cur_best_left_group[:, :-1], y=self.cur_best_left_group[:, -1], is_root=False)
+            self.left_child.fit(x=self.cur_best_left_group[:, :-1], y=self.cur_best_left_group[:, -1], is_root=False,
+                                max_attrs=max_attrs, rand_state=rand_state)
             self.right_child = Node(gini=self.cur_best_right_group_gini)
-            self.right_child.fit(x=self.cur_best_right_group[:, :-1], y=self.cur_best_right_group[:, -1], is_root=False)
+            self.right_child.fit(x=self.cur_best_right_group[:, :-1], y=self.cur_best_right_group[:, -1], is_root=False,
+                                 max_attrs=max_attrs, rand_state=rand_state)
         else:
             # TODO: Gini calculated by parent, but
             self.is_leaf = True
-
-    #
-    # def pred(self, sample):
-    #     while True:
-    #         if self.is_leaf:
-    #             return self.targets
-    #         if sample[self.attr_idx] <= self.threshold:
-    #
-    #         else:
-    #             pass
 
     def _attr_str(self, attr_names: Optional[List[str]] = None):
         return attr_names[self.attr_idx] + '\n' if attr_names else f'X[{self.attr_idx}]'
@@ -168,15 +170,16 @@ class Node:
 
 
 class DecisionTree:
-    def __init__(self):
+    def __init__(self, max_attrs: Optional[int]):
         self.root: Optional[Node] = None
         self.n_attrs: Optional[int] = None
+        self.max_attrs: Optional[int] = max_attrs
 
     def fit(self, x: ArrayLike, y: ArrayLike):
         x, y = check_transform_xy(x, y)
         self.n_attrs = x.shape[1]
         self.root = Node()
-        self.root.fit(x, y, is_root=True)
+        self.root.fit(x, y, is_root=True, max_attrs=self.max_attrs, rand_state=None)
 
     def pred(self, x: ArrayLike):
         """
@@ -190,7 +193,7 @@ class DecisionTree:
         # If input is 1d make it be 2d
         x_dim1 = False
         if len(x.shape) == 1:
-            x = np.expand_dims(x)
+            x = np.expand_dims(x, axis=0)
             x_dim1 = True
         # Check input num of attrs
         if x.shape[1] != self.n_attrs:
@@ -226,4 +229,3 @@ class DecisionTree:
         dg = Digraph('DecisionTree', filename=filename, node_attr={'color': 'lightblue2', 'style': 'filled'})
         self.root.view(digraph=dg, attr_names=attr_names, target_names=target_names)
         dg.view()
-
