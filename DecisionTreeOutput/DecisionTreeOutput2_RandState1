@@ -1,0 +1,114 @@
+digraph DecisionTree {
+	node [color=lightblue2 style=filled]
+	root [label="proline
+ <= 750.00
+gini = 0.66
+n_samples = 119
+"]
+	"root-l" [label="od280/od315_of_diluted_wines
+ <= 2.19
+gini = 0.51
+n_samples = 74
+"]
+	"root-l-l" [label="alcalinity_of_ash
+ <= 17.25
+gini = 0.22
+n_samples = 32
+"]
+	"root-l-l-l" [label="gini = 0.00
+n_samples = 4
+TARGET = class_1" color=lightgreen]
+	"root-l-l" -> "root-l-l-l" [label="alcalinity_of_ash
+ <= 17.25"]
+	"root-l-l-r" [label="gini = 0.00
+n_samples = 28
+TARGET = class_2" color=lightgreen]
+	"root-l-l" -> "root-l-l-r" [label="alcalinity_of_ash
+ > 17.25"]
+	"root-l" -> "root-l-l" [label="od280/od315_of_diluted_wines
+ <= 2.19"]
+	"root-l-r" [label="flavanoids
+ <= 0.74
+gini = 0.13
+n_samples = 42
+"]
+	"root-l-r-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_2" color=lightgreen]
+	"root-l-r" -> "root-l-r-l" [label="flavanoids
+ <= 0.74"]
+	"root-l-r-r" [label="alcohol
+ <= 13.18
+gini = 0.09
+n_samples = 41
+"]
+	"root-l-r-r-l" [label="gini = 0.00
+n_samples = 37
+TARGET = class_1" color=lightgreen]
+	"root-l-r-r" -> "root-l-r-r-l" [label="alcohol
+ <= 13.18"]
+	"root-l-r-r-r" [label="alcohol
+ <= 13.24
+gini = 0.50
+n_samples = 4
+"]
+	"root-l-r-r-r-l" [label="gini = 0.00
+n_samples = 2
+TARGET = class_0" color=lightgreen]
+	"root-l-r-r-r" -> "root-l-r-r-r-l" [label="alcohol
+ <= 13.24"]
+	"root-l-r-r-r-r" [label="gini = 0.00
+n_samples = 2
+TARGET = class_1" color=lightgreen]
+	"root-l-r-r-r" -> "root-l-r-r-r-r" [label="alcohol
+ > 13.24"]
+	"root-l-r-r" -> "root-l-r-r-r" [label="alcohol
+ > 13.18"]
+	"root-l-r" -> "root-l-r-r" [label="flavanoids
+ > 0.74"]
+	"root-l" -> "root-l-r" [label="od280/od315_of_diluted_wines
+ > 2.19"]
+	root -> "root-l" [label="proline
+ <= 750.00"]
+	"root-r" [label="flavanoids
+ <= 2.30
+gini = 0.20
+n_samples = 45
+"]
+	"root-r-l" [label="malic_acid
+ <= 2.04
+gini = 0.38
+n_samples = 4
+"]
+	"root-r-l-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-r-l" -> "root-r-l-l" [label="malic_acid
+ <= 2.04"]
+	"root-r-l-r" [label="gini = 0.00
+n_samples = 3
+TARGET = class_2" color=lightgreen]
+	"root-r-l" -> "root-r-l-r" [label="malic_acid
+ > 2.04"]
+	"root-r" -> "root-r-l" [label="flavanoids
+ <= 2.30"]
+	"root-r-r" [label="alcohol
+ <= 13.02
+gini = 0.05
+n_samples = 41
+"]
+	"root-r-r-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-r-r" -> "root-r-r-l" [label="alcohol
+ <= 13.02"]
+	"root-r-r-r" [label="gini = 0.00
+n_samples = 40
+TARGET = class_0" color=lightgreen]
+	"root-r-r" -> "root-r-r-r" [label="alcohol
+ > 13.02"]
+	"root-r" -> "root-r-r" [label="flavanoids
+ > 2.30"]
+	root -> "root-r" [label="proline
+ > 750.00"]
+}

@@ -1,0 +1,54 @@
+digraph DecisionTree {
+	node [color=lightblue2 style=filled]
+	root [label="color_intensity
+ <= 3.80
+gini = 0.65
+n_samples = 118
+"]
+	"root-l" [label="proline
+ <= 1002.50
+gini = 0.09
+n_samples = 44
+"]
+	"root-l-l" [label="gini = 0.00
+n_samples = 42
+TARGET = class_1" color=lightgreen]
+	"root-l" -> "root-l-l" [label="proline
+ <= 1002.50"]
+	"root-l-r" [label="gini = 0.00
+n_samples = 2
+TARGET = class_0" color=lightgreen]
+	"root-l" -> "root-l-r" [label="proline
+ > 1002.50"]
+	root -> "root-l" [label="color_intensity
+ <= 3.80"]
+	"root-r" [label="flavanoids
+ <= 1.79
+gini = 0.57
+n_samples = 74
+"]
+	"root-r-l" [label="gini = 0.00
+n_samples = 29
+TARGET = class_2" color=lightgreen]
+	"root-r" -> "root-r-l" [label="flavanoids
+ <= 1.79"]
+	"root-r-r" [label="proline
+ <= 679.00
+gini = 0.26
+n_samples = 45
+"]
+	"root-r-r-l" [label="gini = 0.00
+n_samples = 7
+TARGET = class_1" color=lightgreen]
+	"root-r-r" -> "root-r-r-l" [label="proline
+ <= 679.00"]
+	"root-r-r-r" [label="gini = 0.00
+n_samples = 38
+TARGET = class_0" color=lightgreen]
+	"root-r-r" -> "root-r-r-r" [label="proline
+ > 679.00"]
+	"root-r" -> "root-r-r" [label="flavanoids
+ > 1.79"]
+	root -> "root-r" [label="color_intensity
+ > 3.80"]
+}

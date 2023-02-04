@@ -1,0 +1,102 @@
+digraph DecisionTree {
+	node [color=lightblue2 style=filled]
+	root [label="flavanoids
+ <= 0.97
+gini = 0.65
+n_samples = 118
+"]
+	"root-l" [label="malic_acid
+ <= 1.09
+gini = 0.06
+n_samples = 30
+"]
+	"root-l-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-l" -> "root-l-l" [label="malic_acid
+ <= 1.09"]
+	"root-l-r" [label="gini = 0.00
+n_samples = 29
+TARGET = class_2" color=lightgreen]
+	"root-l" -> "root-l-r" [label="malic_acid
+ > 1.09"]
+	root -> "root-l" [label="flavanoids
+ <= 0.97"]
+	"root-r" [label="alcohol
+ <= 13.04
+gini = 0.52
+n_samples = 88
+"]
+	"root-r-l" [label="hue
+ <= 0.68
+gini = 0.08
+n_samples = 46
+"]
+	"root-r-l-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_2" color=lightgreen]
+	"root-r-l" -> "root-r-l-l" [label="hue
+ <= 0.68"]
+	"root-r-l-r" [label="malic_acid
+ <= 3.77
+gini = 0.04
+n_samples = 45
+"]
+	"root-r-l-r-l" [label="gini = 0.00
+n_samples = 43
+TARGET = class_1" color=lightgreen]
+	"root-r-l-r" -> "root-r-l-r-l" [label="malic_acid
+ <= 3.77"]
+	"root-r-l-r-r" [label="alcohol
+ <= 12.40
+gini = 0.50
+n_samples = 2
+"]
+	"root-r-l-r-r-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-r-l-r-r" -> "root-r-l-r-r-l" [label="alcohol
+ <= 12.40"]
+	"root-r-l-r-r-r" [label="gini = 0.00
+n_samples = 1
+TARGET = class_0" color=lightgreen]
+	"root-r-l-r-r" -> "root-r-l-r-r-r" [label="alcohol
+ > 12.40"]
+	"root-r-l-r" -> "root-r-l-r-r" [label="malic_acid
+ > 3.77"]
+	"root-r-l" -> "root-r-l-r" [label="hue
+ > 0.68"]
+	"root-r" -> "root-r-l" [label="alcohol
+ <= 13.04"]
+	"root-r-r" [label="flavanoids
+ <= 2.02
+gini = 0.21
+n_samples = 42
+"]
+	"root-r-r-l" [label="ash
+ <= 2.55
+gini = 0.32
+n_samples = 5
+"]
+	"root-r-r-l-l" [label="gini = 0.00
+n_samples = 4
+TARGET = class_1" color=lightgreen]
+	"root-r-r-l" -> "root-r-r-l-l" [label="ash
+ <= 2.55"]
+	"root-r-r-l-r" [label="gini = 0.00
+n_samples = 1
+TARGET = class_2" color=lightgreen]
+	"root-r-r-l" -> "root-r-r-l-r" [label="ash
+ > 2.55"]
+	"root-r-r" -> "root-r-r-l" [label="flavanoids
+ <= 2.02"]
+	"root-r-r-r" [label="gini = 0.00
+n_samples = 37
+TARGET = class_0" color=lightgreen]
+	"root-r-r" -> "root-r-r-r" [label="flavanoids
+ > 2.02"]
+	"root-r" -> "root-r-r" [label="alcohol
+ > 13.04"]
+	root -> "root-r" [label="flavanoids
+ > 0.97"]
+}

@@ -1,0 +1,78 @@
+digraph DecisionTree {
+	node [color=lightblue2 style=filled]
+	root [label="color_intensity
+ <= 3.80
+gini = 0.66
+n_samples = 118
+"]
+	"root-l" [label="alcohol
+ <= 13.69
+gini = 0.05
+n_samples = 42
+"]
+	"root-l-l" [label="gini = 0.00
+n_samples = 41
+TARGET = class_1" color=lightgreen]
+	"root-l" -> "root-l-l" [label="alcohol
+ <= 13.69"]
+	"root-l-r" [label="gini = 0.00
+n_samples = 1
+TARGET = class_0" color=lightgreen]
+	"root-l" -> "root-l-r" [label="alcohol
+ > 13.69"]
+	root -> "root-l" [label="color_intensity
+ <= 3.80"]
+	"root-r" [label="flavanoids
+ <= 1.80
+gini = 0.58
+n_samples = 76
+"]
+	"root-r-l" [label="ash
+ <= 2.08
+gini = 0.05
+n_samples = 36
+"]
+	"root-r-l-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-r-l" -> "root-r-l-l" [label="ash
+ <= 2.08"]
+	"root-r-l-r" [label="gini = 0.00
+n_samples = 35
+TARGET = class_2" color=lightgreen]
+	"root-r-l" -> "root-r-l-r" [label="ash
+ > 2.08"]
+	"root-r" -> "root-r-l" [label="flavanoids
+ <= 1.80"]
+	"root-r-r" [label="proline
+ <= 737.00
+gini = 0.26
+n_samples = 40
+"]
+	"root-r-r-l" [label="alcohol
+ <= 13.18
+gini = 0.24
+n_samples = 7
+"]
+	"root-r-r-l-l" [label="gini = 0.00
+n_samples = 6
+TARGET = class_1" color=lightgreen]
+	"root-r-r-l" -> "root-r-r-l-l" [label="alcohol
+ <= 13.18"]
+	"root-r-r-l-r" [label="gini = 0.00
+n_samples = 1
+TARGET = class_0" color=lightgreen]
+	"root-r-r-l" -> "root-r-r-l-r" [label="alcohol
+ > 13.18"]
+	"root-r-r" -> "root-r-r-l" [label="proline
+ <= 737.00"]
+	"root-r-r-r" [label="gini = 0.00
+n_samples = 33
+TARGET = class_0" color=lightgreen]
+	"root-r-r" -> "root-r-r-r" [label="proline
+ > 737.00"]
+	"root-r" -> "root-r-r" [label="flavanoids
+ > 1.80"]
+	root -> "root-r" [label="color_intensity
+ > 3.80"]
+}

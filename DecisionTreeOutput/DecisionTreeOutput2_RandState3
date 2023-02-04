@@ -1,0 +1,90 @@
+digraph DecisionTree {
+	node [color=lightblue2 style=filled]
+	root [label="proline
+ <= 750.00
+gini = 0.65
+n_samples = 119
+"]
+	"root-l" [label="od280/od315_of_diluted_wines
+ <= 2.17
+gini = 0.47
+n_samples = 76
+"]
+	"root-l-l" [label="nonflavanoid_phenols
+ <= 0.60
+gini = 0.13
+n_samples = 29
+"]
+	"root-l-l-l" [label="gini = 0.00
+n_samples = 27
+TARGET = class_2" color=lightgreen]
+	"root-l-l" -> "root-l-l-l" [label="nonflavanoid_phenols
+ <= 0.60"]
+	"root-l-l-r" [label="gini = 0.00
+n_samples = 2
+TARGET = class_1" color=lightgreen]
+	"root-l-l" -> "root-l-l-r" [label="nonflavanoid_phenols
+ > 0.60"]
+	"root-l" -> "root-l-l" [label="od280/od315_of_diluted_wines
+ <= 2.17"]
+	"root-l-r" [label="ash
+ <= 2.83
+gini = 0.04
+n_samples = 47
+"]
+	"root-l-r-l" [label="gini = 0.00
+n_samples = 45
+TARGET = class_1" color=lightgreen]
+	"root-l-r" -> "root-l-r-l" [label="ash
+ <= 2.83"]
+	"root-l-r-r" [label="alcohol
+ <= 12.50
+gini = 0.50
+n_samples = 2
+"]
+	"root-l-r-r-l" [label="gini = 0.00
+n_samples = 1
+TARGET = class_1" color=lightgreen]
+	"root-l-r-r" -> "root-l-r-r-l" [label="alcohol
+ <= 12.50"]
+	"root-l-r-r-r" [label="gini = 0.00
+n_samples = 1
+TARGET = class_0" color=lightgreen]
+	"root-l-r-r" -> "root-l-r-r-r" [label="alcohol
+ > 12.50"]
+	"root-l-r" -> "root-l-r-r" [label="ash
+ > 2.83"]
+	"root-l" -> "root-l-r" [label="od280/od315_of_diluted_wines
+ > 2.17"]
+	root -> "root-l" [label="proline
+ <= 750.00"]
+	"root-r" [label="color_intensity
+ <= 3.44
+gini = 0.21
+n_samples = 43
+"]
+	"root-r-l" [label="gini = 0.00
+n_samples = 3
+TARGET = class_1" color=lightgreen]
+	"root-r" -> "root-r-l" [label="color_intensity
+ <= 3.44"]
+	"root-r-r" [label="total_phenols
+ <= 2.00
+gini = 0.10
+n_samples = 40
+"]
+	"root-r-r-l" [label="gini = 0.00
+n_samples = 2
+TARGET = class_2" color=lightgreen]
+	"root-r-r" -> "root-r-r-l" [label="total_phenols
+ <= 2.00"]
+	"root-r-r-r" [label="gini = 0.00
+n_samples = 38
+TARGET = class_0" color=lightgreen]
+	"root-r-r" -> "root-r-r-r" [label="total_phenols
+ > 2.00"]
+	"root-r" -> "root-r-r" [label="color_intensity
+ > 3.44"]
+	root -> "root-r" [label="proline
+ > 750.00"]
+}
